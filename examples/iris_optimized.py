@@ -21,6 +21,12 @@ represents the label assigned to the point by clustering, while the shape (circl
 true class. There is less confusion between the square and triangle classes when compared to using the standard, 
 unweighted Euclidean metric. That is, K-medoids clustering with the optimized weighted Euclidean-Hamming metric achieves 
 an accuracy score of ~0.96 in a classification setting.
+
+Here, we choose to minimize the Blur Ratio: the sum of the cluster variances divided by the total variance. This is the 
+objective used in the paper:
+
+Gupta, A. A., Foster, D. P., & Ungar, L. H. (2008). Unsupervised distance metric learning using predictability. 
+Technical Reports (CIS), 885.
 """
 if __name__ == '__main__':
     n_clusters = 3
