@@ -20,7 +20,8 @@ The plot contains the examples reduced to 2 dimensions using t-SNE (with the sam
 represents the label assigned to the point by clustering, while the shape (circle, triangle, square) represents the 
 true class. There is less confusion between the square and triangle classes when compared to using the standard, 
 unweighted Euclidean metric. That is, K-medoids clustering with the optimized weighted Euclidean-Hamming metric achieves 
-an accuracy score of ~0.96 in a classification setting.
+an accuracy score of ~0.96 in a classification setting, as opposed to a score of 0.90 obtained using a K-medoids 
+classifier with a standard, unweighted Euclidean metric.
 
 Here, we choose to minimize the Blur Ratio: the sum of the cluster variances divided by the total variance. This is the 
 objective used in the paper:
