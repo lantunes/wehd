@@ -2,13 +2,18 @@ from sklearn import datasets
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.manifold import TSNE
 from sklearn_extra.cluster import KMedoids
-from sklearn.metrics import accuracy_score
+from sklearn.metrics.cluster import rand_score
+from sklearn.metrics import accuracy_score, confusion_matrix
+from scipy.stats import mode
 from wehd import WEHD, cluster_variance
 import numpy as np
 from gradient_free_optimizers import EvolutionStrategyOptimizer
 import matplotlib
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
+import warnings
+
+warnings.filterwarnings("ignore")
 
 
 """
@@ -78,7 +83,15 @@ if __name__ == '__main__':
     kmedoids = KMedoids(n_clusters=n_clusters, metric="precomputed").fit(D)
     labels = kmedoids.labels_
 
-    print("accuracy of K-medoids WEHD-optimized classifier: %s" % accuracy_score(y, labels))
+    print("Rand Index of K-medoids WEHD-optimized classifier: %s" % rand_score(y, labels))
+
+    # re-map the cluster labels so that they match class labels
+    labels_remapped = np.zeros_like(labels)
+    for i in range(3):
+        mask = (labels == i)
+        labels_remapped[mask] = mode(y[mask])[0]
+    print("accuracy score: %s" % accuracy_score(y, labels_remapped))
+    print("confusion matrix: \n%s" % confusion_matrix(y, labels_remapped))
 
     tsne = TSNE(n_components=2, verbose=1, perplexity=50, n_iter=500, learning_rate=10, metric="precomputed")
     result = tsne.fit_transform(D)
