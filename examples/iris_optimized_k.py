@@ -18,8 +18,8 @@ warnings.filterwarnings("ignore")
 
 """
 Here we take the Iris dataset, consisting of 150 labelled examples with 4 continuous features each. There are 3 classes.
-We use K-medoids clustering with k=3 and a weighted Euclidean-Hamming distance. We optimize the weights of the metric 
-using Evolution Strategies. Thus, this is an example of unsupervised metric learning.
+We use K-medoids clustering with k=3 and a weighted Euclidean-Hamming distance. We optimize the weights of the metric,  
+and the number of clusters, using Evolution Strategies. Thus, this is an example of unsupervised metric learning.
 
 The plot contains the examples reduced to 2 dimensions using t-SNE (with the same metric). The color of each point 
 represents the label assigned to the point by clustering, while the shape (circle, triangle, square) represents the 
@@ -33,10 +33,12 @@ objective used in the paper:
 
 Gupta, A. A., Foster, D. P., & Ungar, L. H. (2008). Unsupervised distance metric learning using predictability. 
 Technical Reports (CIS), 885.
+
+Here, We don't assume the number of clusters. We add a term to our objective that penalizes a higher number of clusters.
+We don't assume we know the number of clusters, but instead provide a range of guesses, numbers in [2, 6], and the
+optimization discovers that the ideal number of clusters is 3.
 """
 if __name__ == '__main__':
-    n_clusters = 3
-
     iris = datasets.load_iris()
 
     X = iris.data
@@ -52,7 +54,7 @@ if __name__ == '__main__':
 
         D = w.get_distance_matrix(X)
 
-        kmedoids = KMedoids(n_clusters=n_clusters, metric="precomputed").fit(D)
+        kmedoids = KMedoids(n_clusters=int(para["k"]), metric="precomputed").fit(D)
         labels = kmedoids.labels_
 
         clusters = set(labels)
@@ -64,10 +66,13 @@ if __name__ == '__main__':
 
         SST = cluster_variance(list(range(len(X))), D)  # the total variance
 
-        return -SSC/SST  # we want to minimize SSC/SST
+        # adding a term that attempts to get the number of clusters being ideal, so that we don't get too many clusters
+        # TODO how do we determine the factor 0.05?
+        return -(SSC / SST + 0.05*len(clusters))  # we want to minimize SSC/SST
 
 
     search_space = {
+        "k": [1, 2, 3, 4, 5, 6],
         "w1": np.linspace(0, 1, 21),
         "w2": np.linspace(0, 1, 21),
         "w3": np.linspace(0, 1, 21),
@@ -75,15 +80,18 @@ if __name__ == '__main__':
     }
 
     opt = EvolutionStrategyOptimizer(search_space)
-    opt.search(model, n_iter=500)
+    opt.search(model, n_iter=2500)
 
     best_params = opt.best_para
     weights = [best_params["w1"], best_params["w2"], best_params["w3"], best_params["w4"]]
     w = WEHD(categorical_indices=[], weights=weights)
     D = w.get_distance_matrix(X)
 
-    kmedoids = KMedoids(n_clusters=n_clusters, metric="precomputed").fit(D)
+    kmedoids = KMedoids(n_clusters=int(best_params["k"]), metric="precomputed").fit(D)
     labels = kmedoids.labels_
+
+    clusters = set(labels)
+    print("num clusters: %s" % len(clusters))
 
     print("Rand Index of K-medoids WEHD-optimized classifier: %s" % rand_score(y, labels))
 
@@ -98,7 +106,7 @@ if __name__ == '__main__':
     tsne = TSNE(n_components=2, verbose=1, perplexity=50, n_iter=500, learning_rate=10, metric="precomputed")
     result = tsne.fit_transform(D)
 
-    norm = matplotlib.colors.Normalize(vmin=0, vmax=n_clusters, clip=True)
+    norm = matplotlib.colors.Normalize(vmin=0, vmax=len(clusters), clip=True)
     mapper = cm.ScalarMappable(norm=norm, cmap=cm.Accent)
     colors = [mapper.to_rgba(label) for label in labels]
 

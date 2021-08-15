@@ -13,3 +13,6 @@ References
 
 > Gupta, A. A., Foster, D. P., & Ungar, L. H. (2008). Unsupervised distance metric learning using predictability. Technical Reports (CIS), 885.
 
+> Li, C., & Li, H. (2010). A Survey of Distance Metrics for Nominal Attributes. J. Softw., 5(11), 1262-1269.
+
+> Shi, Y., Li, W., & Sha, F. (2016, March). Metric learning for ordinal data. In Proceedings of the AAAI Conference on Artificial Intelligence (Vol. 30, No. 1).
