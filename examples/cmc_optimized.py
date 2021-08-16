@@ -16,6 +16,13 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
+"""
+The UCI Contraceptive Dataset (i.e. "cmc") is difficult to classify, according to Lim, T. S., Loh, W. Y., & Shih, Y. S. 
+(2000). A comparison of prediction accuracy, complexity, and training time of thirty-three old and new classification 
+algorithms. Machine learning, 40(3), 203-228:
+
+"The most difficult to classify are cmc, cmc+, and tae+, with minimum error rates greater than 0.4."
+"""
 if __name__ == '__main__':
     n_clusters = 3
 
