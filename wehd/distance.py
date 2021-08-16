@@ -37,7 +37,8 @@ class WEHD:
             D_euclid = pairwise_distances(X_euclid, metric="minkowski", p=2, w=self._weights[self._num_ind])
 
         D_hamming = 0.
-        if X_hamming.shape[1] > 0:
+        if X_hamming.shape[1] > 0 and np.sum(self._weights[self._cat_ind]) != 0:
+            # if all weights for Hamming metric are zero, then we get a distance matrix with NaN
             D_hamming = pairwise_distances(X_hamming, metric="hamming", w=self._weights[self._cat_ind])
 
         return D_euclid + D_hamming

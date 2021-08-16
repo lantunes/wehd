@@ -47,7 +47,10 @@ if __name__ == '__main__':
 
 
     def model(para):
-        weights = [para["w1"], para["w2"], para["w3"], para["w4"]]
+        weights = np.array([para["w1"], para["w2"], para["w3"], para["w4"]])
+        tot = np.sum(weights)
+        if tot > 0:
+            weights = weights / tot
         w = WEHD(categorical_indices=[], weights=weights)
 
         D = w.get_distance_matrix(X)
@@ -68,18 +71,18 @@ if __name__ == '__main__':
 
 
     search_space = {
-        "w1": np.linspace(0, 1, 21),
-        "w2": np.linspace(0, 1, 21),
-        "w3": np.linspace(0, 1, 21),
-        "w4": np.linspace(0, 1, 21),
+        "w1": np.linspace(0, 21, 22),  # ints 0 to 21
+        "w2": np.linspace(0, 21, 22),  # ints 0 to 21
+        "w3": np.linspace(0, 21, 22),  # ints 0 to 21
+        "w4": np.linspace(0, 21, 22),  # ints 0 to 21
     }
 
     opt = EvolutionStrategyOptimizer(search_space)
     opt.search(model, n_iter=500)
 
     best_params = opt.best_para
-    weights = [best_params["w1"], best_params["w2"], best_params["w3"], best_params["w4"]]
-    w = WEHD(categorical_indices=[], weights=weights)
+    weights = np.array([best_params["w1"], best_params["w2"], best_params["w3"], best_params["w4"]])
+    w = WEHD(categorical_indices=[], weights=weights / np.sum(weights))
     D = w.get_distance_matrix(X)
 
     kmedoids = KMedoids(n_clusters=n_clusters, metric="precomputed").fit(D)
